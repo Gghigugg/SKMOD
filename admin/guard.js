@@ -1,0 +1,1 @@
+if(sessionStorage.getItem('skmod_admin_auth')!=='true')location.replace('login.html');
