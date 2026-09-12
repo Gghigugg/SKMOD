@@ -1,3 +1,10 @@
 [
-  {"name":"Demo App","category":"Apps","version":"1.0.0","size":"12 MB","rating":4.8}
+  {"name":"Demo App","category":"Apps","version":"1.0.0","size":"12 MB","rating":4.8,"developer":"SKMOD Labs","downloads":"10K+","icon":"◈"},
+  {"name":"Pixel Racer","category":"Games","version":"2.4.1","size":"86 MB","rating":4.7,"developer":"SKMOD Games","downloads":"50K+","icon":"🏎️"},
+  {"name":"Quick Tools","category":"Tools","version":"3.1.0","size":"18 MB","rating":4.6,"developer":"SKMOD Labs","downloads":"25K+","icon":"🛠️"},
+  {"name":"Stream Hub","category":"Entertainment","version":"5.0.2","size":"42 MB","rating":4.5,"developer":"SKMOD Media","downloads":"100K+","icon":"▶️"},
+  {"name":"Shadow Arena","category":"Games","version":"1.8.0","size":"120 MB","rating":4.9,"developer":"SKMOD Games","downloads":"200K+","icon":"⚔️"},
+  {"name":"File Vault","category":"Apps","version":"2.0.4","size":"24 MB","rating":4.7,"developer":"SKMOD Labs","downloads":"75K+","icon":"🔐"},
+  {"name":"Device Tools","category":"Tools","version":"1.5.3","size":"15 MB","rating":4.4,"developer":"SKMOD Labs","downloads":"30K+","icon":"⚙️"},
+  {"name":"Music Wave","category":"Entertainment","version":"4.2.0","size":"36 MB","rating":4.8,"developer":"SKMOD Media","downloads":"150K+","icon":"🎵"}
 ]
