@@ -1,0 +1,1 @@
+const input=document.querySelector('#search');const results=document.querySelector('#results');if(input)input.addEventListener('input',async()=>{const apps=await (await fetch('../data/apps.json')).json();const q=input.value.toLowerCase();results.innerHTML=apps.filter(a=>a.name.toLowerCase().includes(q)).map(a=>`<p>${a.name}</p>`).join('')||'<p>No apps found.</p>'});
