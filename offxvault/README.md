@@ -22,7 +22,7 @@ Premium mobile-first private-gallery simulation for owner-provided photos and vi
 
 These are intentionally client-side demo values and are visible in the browser/source:
 
-- Main popup: `OFFX-START-2026`
+- Main popup: `RED-FOX`
 - OffxVauLt unlock: `OFFX-UNLOCK-001`
 - AccessBySomesh unlock: `ACCESS-UNLOCK-002`
 - HaCkeR-sOmesh unlock: `SOMESH-UNLOCK-003`
