@@ -1,4 +1,4 @@
-const VAULT_CONFIG={popupPassword:"OFFX-START-2026",defaultRevealCount:10,galleries:{
+const VAULT_CONFIG={popupPassword:"RED-FOX",defaultRevealCount:10,galleries:{
 "OffxVauLt":{title:"Collection 001",revealCount:10,unlockCode:"OFFX-UNLOCK-001",media:[{type:"image",src:"gallery/OffxVauLt/01.jpg"},{type:"image",src:"gallery/OffxVauLt/02.jpg"},{type:"video",src:"gallery/OffxVauLt/03.mp4"}]},
 "AccessBySomesh":{title:"Collection 002",revealCount:10,unlockCode:"ACCESS-UNLOCK-002",media:[{type:"image",src:"gallery/AccessBySomesh/01.jpg"},{type:"video",src:"gallery/AccessBySomesh/02.mp4"}]},
 "HaCkeR-sOmesh":{title:"Collection 003",revealCount:10,unlockCode:"SOMESH-UNLOCK-003",media:[{type:"image",src:"gallery/HaCkeR-sOmesh/01.jpg"}]},
