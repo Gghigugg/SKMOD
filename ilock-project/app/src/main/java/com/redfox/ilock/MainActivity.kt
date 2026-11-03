@@ -131,12 +131,7 @@ private fun DynamicIsland() {
             shadowElevation = 12.dp
         ) {
             Row(Modifier.fillMaxSize().padding(horizontal = 15.dp), verticalAlignment = Alignment.CenterVertically) {
-                androidx.compose.material3.Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.Lock,
-                    contentDescription = "Lock",
-                    tint = LockWhite,
-                    modifier = Modifier.size(17.dp)
-                )
+                Text("▣", color = LockWhite, fontSize = 16.sp)
             }
         }
         Box(Modifier.width(164.dp).height(35.dp).clip(CircleShape)
@@ -218,19 +213,7 @@ private fun RoundLockButton(type: String) {
         shadowElevation = 12.dp
     ) {
         Box(contentAlignment = Alignment.Center) {
-            if (type == "flash") {
-                androidx.compose.material3.Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.FlashlightOn,
-                    contentDescription = "Flashlight",
-                    tint = LockWhite, modifier = Modifier.size(26.dp)
-                )
-            } else {
-                androidx.compose.material3.Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.CameraAlt,
-                    contentDescription = "Camera",
-                    tint = LockWhite, modifier = Modifier.size(26.dp)
-                )
-            }
+            Text(if (type == "flash") "ϟ" else "◎", color = LockWhite, fontSize = 28.sp)
         }
     }
 }
