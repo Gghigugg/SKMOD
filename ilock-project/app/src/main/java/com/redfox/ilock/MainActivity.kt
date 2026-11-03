@@ -3,39 +3,26 @@ package com.redfox.ilock
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.graphicsLayer
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
-private val White = Color.White
-private val GlassEdge = White.copy(alpha = .52f)
+private val PasscodeWhite = Color(0xFFF7F7F7)
 
 class MainActivity : ComponentActivity() {
     @Suppress("DEPRECATION")
@@ -47,219 +34,191 @@ class MainActivity : ComponentActivity() {
             android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
             android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
             android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-        setContent { MaterialTheme { IOSLockScreen() } }
+        setContent { MaterialTheme { IOSPasscodeScreen() } }
     }
 }
 
 @Composable
-private fun IOSLockScreen() {
-    var drag by remember { mutableFloatStateOf(0f) }
-    var unlocked by remember { mutableStateOf(false) }
-    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    LaunchedEffect(Unit) {
-        while (true) { now = System.currentTimeMillis(); delay(1000) }
-    }
-    val reveal by animateFloatAsState(
-        if (unlocked) 1f else (drag / 220f).coerceIn(0f, 1f),
-        spring(dampingRatio = .84f, stiffness = 300f), label = "unlock"
-    )
-    val clock = remember(now) { SimpleDateFormat("h:mm", Locale.getDefault()).format(Date(now)) }
-    val date = remember(now) {
-        SimpleDateFormat("EEEE, d MMMM", Locale.getDefault()).format(Date(now))
-            .replaceFirstChar { it.uppercase() }
-    }
-
-    BoxWithConstraints(Modifier.fillMaxSize().background(Color(0xFF858C87))) {
-        val screenHeight = maxHeight
-        // Layered, softly blurred wallpaper light; neutral, warm and photographic in feel.
+private fun IOSPasscodeScreen() {
+    BoxWithConstraints(
+        Modifier.fillMaxSize().background(Color(0xFF080808))
+    ) {
+        val h = maxHeight
+        // Dark blurred wallpaper glow, matching the supplied passcode reference.
         Box(Modifier.fillMaxSize().background(
-            Brush.linearGradient(listOf(Color(0xFF687773), Color(0xFFC8B9A6), Color(0xFFE6D8C7), Color(0xFF737D77)))
+            Brush.verticalGradient(
+                0f to Color(0xFF101010),
+                .46f to Color(0xFF090909),
+                .72f to Color(0xFF24201F),
+                1f to Color(0xFF666466)
+            )
         ))
-        LightBlob(Modifier.align(Alignment.TopStart).offset((-110).dp, 90.dp).size(330.dp), Color(0xFFFFE5C8), 85.dp)
-        LightBlob(Modifier.align(Alignment.TopEnd).offset(110.dp, 240.dp).size(290.dp), Color(0xFFDCE6DC), 90.dp)
-        LightBlob(Modifier.align(Alignment.BottomStart).offset((-100).dp, (-20).dp).size(360.dp), Color(0xFFE9C9B2), 95.dp)
-        LightBlob(Modifier.align(Alignment.BottomEnd).offset(100.dp, 30.dp).size(300.dp), Color(0xFFC9D3CB), 90.dp)
-        Box(Modifier.fillMaxSize().background(
-            Brush.verticalGradient(listOf(White.copy(.16f), Color.Transparent, Color.Black.copy(.13f)))
-        ))
-
-        Column(
-            Modifier.fillMaxSize()
-                .graphicsLayer {
-                    translationY = -reveal * screenHeight.toPx() * .78f
-                    scaleX = 1f - reveal * .035f
-                    scaleY = 1f - reveal * .035f
-                }
-                .padding(horizontal = 25.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Box(
+            Modifier.align(Alignment.Center).offset(y = 125.dp)
+                .size(width = 250.dp, height = 330.dp)
+                .blur(100.dp).background(Color(0xFF8C5B50).copy(alpha = .42f), CircleShape)
+        )
+        Box(
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(h * .34f)
+                .background(Brush.verticalGradient(
+                    listOf(Color.Transparent, Color(0xFF777579).copy(alpha = .72f))
+                ))
+        )
+        Column(Modifier.fillMaxSize().padding(horizontal = 28.dp)) {
             Spacer(Modifier.height(12.dp))
-            IOSStatusBar()
-            Spacer(Modifier.height(29.dp))
-            Text(date, color = White.copy(.98f), fontSize = 17.sp, fontWeight = FontWeight.Medium)
-            Text(clock, color = White, fontSize = 94.sp, lineHeight = 98.sp,
-                fontWeight = FontWeight.ExtraLight, letterSpacing = (-5.5).sp)
-            Spacer(Modifier.height(13.dp))
-            WeatherWidget()
-            Spacer(Modifier.weight(1f))
-            NotificationStack()
-            Spacer(Modifier.weight(1f))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-                LockShortcut("ϟ")
-                LockShortcut("◉")
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text("Airtel", color = PasscodeWhite, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.weight(1f))
+                Text("▮▮▮", color = PasscodeWhite.copy(.55f), fontSize = 15.sp, letterSpacing = (-2).sp)
+                Spacer(Modifier.width(8.dp))
+                BatteryIcon()
             }
-            Spacer(Modifier.height(15.dp))
-            Text(if (unlocked) "Preview unlocked" else "Swipe up to open",
-                color = White.copy(.96f), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-            Spacer(Modifier.height(8.dp))
-            Box(
-                Modifier.fillMaxWidth().height(42.dp).pointerInput(unlocked) {
-                    detectVerticalDragGestures(
-                        onVerticalDrag = { _, amount -> drag = (drag - amount).coerceIn(0f, 300f) },
-                        onDragEnd = { if (drag > 90f) unlocked = true; drag = 0f }
-                    )
-                }, contentAlignment = Alignment.Center
+
+            Spacer(Modifier.height(9.dp))
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                LockGlyph()
+            }
+
+            Spacer(Modifier.height(105.dp))
+            Text(
+                "Enter Passcode",
+                modifier = Modifier.fillMaxWidth(),
+                color = PasscodeWhite,
+                fontSize = 23.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
+                letterSpacing = (-.35).sp
+            )
+            Spacer(Modifier.height(24.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(Modifier.width(136.dp).height(5.dp).clip(CircleShape).background(White))
-            }
-            Spacer(Modifier.height(4.dp))
-        }
-
-        if (unlocked) {
-            Surface(
-                Modifier.align(Alignment.Center).padding(28.dp),
-                shape = RoundedCornerShape(30.dp), color = White.copy(.22f),
-                border = BorderStroke(1.dp, GlassEdge), shadowElevation = 24.dp
-            ) {
-                Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Welcome", color = White, fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
-                    Text("Lock-screen interaction preview", color = White.copy(.9f), fontSize = 13.sp)
-                    Spacer(Modifier.height(14.dp))
-                    Text("Swipe down to return", color = White, fontSize = 12.sp)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun IOSStatusBar() {
-    Row(Modifier.fillMaxWidth().height(22.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(SimpleDateFormat("h:mm", Locale.getDefault()).format(Date()),
-            color = White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.weight(1f))
-        IOSSignalIcons()
-    }
-}
-
-@Composable
-private fun IOSSignalIcons() {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-        Canvas(Modifier.size(width = 18.dp, height = 14.dp)) {
-            val widths = size.width / 5f
-            for (i in 0..3) {
-                val barHeight = size.height * (0.30f + i * 0.19f)
-                drawRoundRect(White, Offset(i * (widths + 1.1.dp.toPx()), size.height - barHeight),
-                    androidx.compose.ui.geometry.Size(widths, barHeight),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(2.dp.toPx()))
-            }
-        }
-        Canvas(Modifier.size(17.dp, 14.dp)) {
-            val p = androidx.compose.ui.graphics.Path().apply {
-                moveTo(size.width * .08f, size.height * .38f)
-                quadraticTo(size.width * .5f, -size.height * .12f, size.width * .92f, size.height * .38f)
-                moveTo(size.width * .25f, size.height * .57f)
-                quadraticTo(size.width * .5f, size.height * .20f, size.width * .75f, size.height * .57f)
-                moveTo(size.width * .44f, size.height * .78f)
-                quadraticTo(size.width * .5f, size.height * .68f, size.width * .56f, size.height * .78f)
-            }
-            drawPath(p, White, style = androidx.compose.ui.graphics.drawscope.Stroke(1.7.dp.toPx()))
-        }
-        Canvas(Modifier.size(width = 25.dp, height = 14.dp)) {
-            drawRoundRect(White.copy(.95f), cornerRadius = androidx.compose.ui.geometry.CornerRadius(3.dp.toPx()),
-                style = androidx.compose.ui.graphics.drawscope.Stroke(1.2.dp.toPx()))
-            drawRoundRect(White, topLeft = Offset(2.dp.toPx(), 2.dp.toPx()),
-                size = androidx.compose.ui.geometry.Size(size.width * .68f, size.height - 4.dp.toPx()),
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(1.5.dp.toPx()))
-            drawRect(White, topLeft = Offset(size.width, size.height * .34f),
-                size = androidx.compose.ui.geometry.Size(2.dp.toPx(), size.height * .32f))
-        }
-    }
-}
-
-@Composable
-private fun WeatherWidget() {
-    Surface(
-        shape = RoundedCornerShape(22.dp),
-        color = White.copy(.16f),
-        border = BorderStroke(1.dp, White.copy(.36f)),
-        shadowElevation = 10.dp
-    ) {
-        Row(Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("☀", color = Color(0xFFFFE5A5), fontSize = 28.sp)
-            Column {
-                Text("WEATHER", color = White.copy(.78f), fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
-                Text("Add your city", color = White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
-            }
-            Text("—°", color = White, fontSize = 23.sp, fontWeight = FontWeight.Light)
-        }
-    }
-}
-
-@Composable
-private fun LightBlob(modifier: Modifier, color: Color, blurRadius: androidx.compose.ui.unit.Dp) {
-    Box(modifier.blur(blurRadius).clip(CircleShape).background(color.copy(.76f)))
-}
-
-@Composable
-private fun NotificationStack() {
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-        GlassNotification("MESSAGES", "Your day, your moment", "Everything is looking beautiful today.", "now", "✦")
-        GlassNotification("NOTIFICATIONS", "A softer lock screen", "Your liquid glass display is ready.", "1m", "◌")
-    }
-}
-
-@Composable
-private fun GlassNotification(app: String, title: String, body: String, time: String, icon: String) {
-    Surface(
-        Modifier.fillMaxWidth(), shape = RoundedCornerShape(25.dp),
-        color = White.copy(.20f), border = BorderStroke(1.dp, White.copy(.55f)),
-        shadowElevation = 17.dp
-    ) {
-        Box {
-            Box(Modifier.fillMaxWidth().height(30.dp).background(
-                Brush.verticalGradient(listOf(White.copy(.18f), Color.Transparent))))
-            Row(Modifier.padding(horizontal = 15.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = RoundedCornerShape(10.dp), color = White.copy(.25f),
-                    border = BorderStroke(1.dp, White.copy(.34f))) {
-                    Box(Modifier.size(34.dp), contentAlignment = Alignment.Center) {
-                        Text(icon, color = White, fontSize = 18.sp)
+                repeat(4) { index ->
+                    Box(
+                        Modifier.padding(horizontal = 13.dp).size(22.dp)
+                            .then(if (index < 3) Modifier.background(PasscodeWhite, CircleShape)
+                            else Modifier.background(Color.Transparent, CircleShape)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (index == 3) {
+                            Box(Modifier.fillMaxSize().background(
+                                Brush.radialGradient(listOf(Color.Transparent, Color.Transparent)
+                                ), CircleShape
+                            ))
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                shape = CircleShape,
+                                color = Color.Transparent,
+                                border = androidx.compose.foundation.BorderStroke(1.5.dp, PasscodeWhite)
+                            ) {}
+                        }
                     }
                 }
-                Spacer(Modifier.width(11.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(app, color = White.copy(.78f), fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
-                    Text(title, color = White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                    Text(body, color = White.copy(.88f), fontSize = 11.sp)
+            }
+
+            Spacer(Modifier.weight(1f))
+            Column(
+                Modifier.fillMaxWidth().padding(horizontal = 15.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                val rows = listOf(
+                    listOf("1" to "", "2" to "ABC", "3" to "DEF"),
+                    listOf("4" to "GHI", "5" to "JKL", "6" to "MNO"),
+                    listOf("7" to "PQRS", "8" to "TUV", "9" to "WXYZ")
+                )
+                rows.forEach { row ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        row.forEach { (number, letters) -> NumberKey(number, letters) }
+                    }
                 }
-                Text(time, color = White.copy(.76f), fontSize = 10.sp)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    NumberKey("0", "")
+                }
+            }
+            Spacer(Modifier.weight(1f))
+            Box(Modifier.fillMaxWidth().height(38.dp), contentAlignment = Alignment.CenterEnd) {
+                Text("Clear", color = PasscodeWhite, fontSize = 16.sp, fontWeight = FontWeight.Medium)
+            }
+            Spacer(Modifier.height(18.dp))
+            Box(Modifier.fillMaxWidth().height(22.dp), contentAlignment = Alignment.Center) {
+                Box(Modifier.width(132.dp).height(5.dp).clip(CircleShape).background(PasscodeWhite))
+            }
+            Spacer(Modifier.height(3.dp))
+        }
+    }
+}
+
+@Composable
+private fun NumberKey(number: String, letters: String) {
+    Surface(
+        modifier = Modifier.size(91.dp),
+        shape = CircleShape,
+        color = Color(0xFF858487).copy(alpha = .43f)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(number, color = PasscodeWhite, fontSize = 39.sp, fontWeight = FontWeight.Light, lineHeight = 42.sp)
+            if (letters.isNotEmpty()) {
+                Text(letters, color = PasscodeWhite.copy(.92f), fontSize = 9.sp,
+                    fontWeight = FontWeight.Medium, letterSpacing = 2.sp)
             }
         }
     }
 }
 
 @Composable
-private fun LockShortcut(symbol: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Surface(Modifier.size(54.dp), shape = CircleShape, color = White.copy(.22f),
-            border = BorderStroke(1.dp, White.copy(.58f)), shadowElevation = 13.dp) {
-            Box(contentAlignment = Alignment.Center) {
-                Text(symbol, color = White, fontSize = 24.sp, fontWeight = FontWeight.Light)
+private fun LockGlyph() {
+    Box(Modifier.size(width = 38.dp, height = 49.dp), contentAlignment = Alignment.BottomCenter) {
+        Box(
+            Modifier.align(Alignment.TopCenter).width(24.dp).height(29.dp)
+                .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
+                .background(Color.Transparent)
+        ) {
+            Box(Modifier.fillMaxSize().padding(3.dp).clip(
+                RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+            ).background(Color.Transparent))
+            androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+                drawArc(
+                    color = PasscodeWhite,
+                    startAngle = 180f,
+                    sweepAngle = 180f,
+                    useCenter = false,
+                    topLeft = androidx.compose.ui.geometry.Offset(size.width * .12f, size.height * .05f),
+                    size = androidx.compose.ui.geometry.Size(size.width * .76f, size.height * .9f),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 4.dp.toPx())
+                )
             }
         }
+        Box(
+            Modifier.width(36.dp).height(29.dp).clip(RoundedCornerShape(5.dp))
+                .background(PasscodeWhite)
+        )
+    }
+}
+
+@Composable
+private fun BatteryIcon() {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            Modifier.width(30.dp).height(15.dp).clip(RoundedCornerShape(4.dp))
+                .background(Color.Transparent)
+        ) {
+            androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+                drawRoundRect(
+                    color = PasscodeWhite.copy(.85f),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.4.dp.toPx()),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(3.dp.toPx())
+                )
+                drawRoundRect(
+                    color = Color(0xFF75D36C),
+                    topLeft = androidx.compose.ui.geometry.Offset(2.dp.toPx(), 2.dp.toPx()),
+                    size = androidx.compose.ui.geometry.Size(size.width * .70f, size.height - 4.dp.toPx()),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(2.dp.toPx())
+                )
+            }
+        }
+        Box(Modifier.padding(start = 1.dp).width(2.dp).height(6.dp)
+            .clip(RoundedCornerShape(1.dp)).background(PasscodeWhite.copy(.8f)))
     }
 }
