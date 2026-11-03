@@ -161,9 +161,14 @@ private fun IOSHomeLockScreen(time: String, date: String, onSwipeUp: () -> Unit)
             Box(
                 Modifier.fillMaxWidth().height(34.dp)
                     .pointerInput(Unit) {
+                        var totalDrag = 0f
                         detectVerticalDragGestures(
-                            onVerticalDrag = { _, _ -> },
-                            onDragEnd = onSwipeUp
+                            onVerticalDrag = { _, amount -> totalDrag += amount },
+                            onDragEnd = {
+                                if (totalDrag < -45f) onSwipeUp()
+                                totalDrag = 0f
+                            },
+                            onDragCancel = { totalDrag = 0f }
                         )
                     },
                 contentAlignment = Alignment.Center
